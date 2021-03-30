@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RecipeWebApp.Models;
 using System;
@@ -12,15 +13,20 @@ namespace RecipeWebApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private RecipesContext _context { get; set; }
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, RecipesContext ctx)
         {
             _logger = logger;
+            _context = ctx;
         }
 
-        public IActionResult Index()
-        {
-            return View();
+        //[HttpGet]
+        public IActionResult Index(long? mealTypeId)
+        {            
+            return View(_context.Recipes
+                .FromSqlInterpolated($"SELECT * FROM Recipes WHERE RecipeClassId = {mealTypeId} OR {mealTypeId} IS NULL")
+                .ToList()); //this is a set of data, not just a record of data
         }
 
         public IActionResult Privacy()
