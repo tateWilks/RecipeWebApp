@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RecipeWebApp.Models;
+using RecipeWebApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +15,7 @@ namespace RecipeWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private RecipesContext _context { get; set; }
+        public int ItemsPerPage = 2;
 
         public HomeController(ILogger<HomeController> logger, RecipesContext ctx)
         {
@@ -22,11 +24,46 @@ namespace RecipeWebApp.Controllers
         }
 
         //[HttpGet]
-        public IActionResult Index(long? mealTypeId)
+        public IActionResult Index(long? icategory, string category, int pagenum=1)
         {            
-            return View(_context.Recipes
-                .FromSqlInterpolated($"SELECT * FROM Recipes WHERE RecipeClassId = {mealTypeId} OR {mealTypeId} IS NULL")
-                .ToList()); //this is a set of data, not just a record of data
+            int PageNum = pagenum;
+            
+            if (!System.String.IsNullOrEmpty(category))
+            {
+                return View(new IndexViewModel
+                {
+                    Recipes = _context.Recipes
+                        .FromSqlInterpolated($"SELECT * FROM Recipes WHERE RecipeClassId = {icategory} OR {icategory} IS NULL")
+                        .ToList(),
+                    PageInfo = new Paging
+                    {
+                        NumItemsPage = ItemsPerPage,
+                        CurrPage = pagenum,
+                        //if no category is selected, get the full count. otherwise, run a query to get the meals only associated with the category
+                        TotalItems = _context.Recipes.Where(r => r.RecipeClassId == icategory).Count()
+                    },
+                    Category = category
+                });                              
+            } 
+            else
+            {
+                return View(new IndexViewModel
+                {
+                    Recipes = _context.Recipes                        
+                        .OrderBy(r => r.RecipeTitle)
+                        .Skip((PageNum - 1) * ItemsPerPage)
+                        .Take(ItemsPerPage)
+                        .ToList(),
+                    PageInfo = new Paging
+                    {
+                        NumItemsPage = ItemsPerPage,
+                        CurrPage = pagenum,
+                        //if no category is selected, get the full count. otherwise, run a query to get the meals only associated with the category
+                        TotalItems = (icategory == null) ? _context.Recipes.Count() : _context.Recipes.Where(r => r.RecipeClassId == icategory).Count()
+                    },
+                    Category = category
+                });                   
+            }
         }
 
         public IActionResult Privacy()

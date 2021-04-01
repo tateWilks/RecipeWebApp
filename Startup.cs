@@ -52,13 +52,23 @@ namespace RecipeWebApp
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute("categoryPageNum",
+                    "Category/{icategory}/{category}/{pagenum}",
+                    new { Controller = "Home", action = "Index" });
+
+                //other endpoints need to come before the default endpoint, or everything will be rerouted to the endpoint
+                //also, view components all need to have matching names (files, variables, etc.)
+                endpoints.MapControllerRoute("category",
+                    "Category/{icategory}/{category}",
+                    new { Controller = "Home", action = "Index" }); //name, pattern, or you can do parameter name, pattern, controller + action parameters
+
+                endpoints.MapControllerRoute("pagenum",
+                    "All/{pagenum}",
+                    new { Controller = "Home", action = "Index" });
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute("mealTypeId",
-                    "MealType/{mealTypeId}",
-                    new { Controller = "Home", action = "Index" }); //name, pattern, or you can do parameter name, pattern, controller + action parameters
             });
         }
     }

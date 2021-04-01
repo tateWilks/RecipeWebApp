@@ -1,0 +1,8 @@
+﻿@model IEnumerable<RecipeClasses>
+
+<a class="page-link" asp-action="Index" asp-controller="Home" asp-route-category="">Home</a>
+
+@foreach(var rc in Model)
+{
+    <a class="page-link" asp-action="Index" asp-controller="Home" asp-route-icategory="@rc.RecipeClassId" asp-route-category="@rc.RecipeClassDescription">@rc.RecipeClassDescription</a> //creates a route that has the "category" name and then gives it a value
+}

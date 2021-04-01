@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace RecipeWebApp.Components
 {
-    public class MealTypeViewComponent : ViewComponent
+    public class CategoryViewComponent : ViewComponent
     {
         private RecipesContext _context;
-        public MealTypeViewComponent(RecipesContext ctx)
+        public CategoryViewComponent(RecipesContext ctx)
         {
             _context = ctx;
         }
